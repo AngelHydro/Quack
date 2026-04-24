@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "Quack"
+description = "A rubber duck that lives on your desktop"
+readme = "README.md"
+authors = [name = "Angel SANCHEZ"]
+urls = {
+    "Homepage" = "https://github.com/AngelHydro/Quack",
+}
+dependencies = [
+    "pillow",
+    "pynput",
+    "playsound",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[project.scripts]
+quack = "quack.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quack*"]
+
+[tool.setuptools.package-data]
+quack = ["assets/*"]
