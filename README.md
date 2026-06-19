@@ -22,38 +22,51 @@ Pillow and the quack sound is synthesised with pure math. No external asset file
 - **Sleeps** after 15 minutes of inactivity (eyes close, Zzz) and wakes on any click
 - **Draggable** — left-click and drag to reposition the duck
 
+## Install (just run it — no Python needed)
+
+Download **`Quack.exe`** from the
+[Releases page](https://github.com/AngelHydro/Quack/releases) and double-click it.
+That's it — it's fully self-contained, no Python or any install required. You can
+move it to your Desktop or pin a shortcut anywhere.
+
+> The `.exe` is intentionally **not** stored in the repository (it's a 29 MB
+> binary). It is published on the Releases page instead, built automatically by
+> GitHub. See [Building](#building-from-source) below if you want to make it yourself.
+
 ## Run from source
 
-Requires Python 3.10+ and [Pillow](https://python-pillow.org/).
+For developers who have Python 3.10+ installed:
 
 ```sh
 pip install pillow
 python -m quack
 ```
 
-## Build a standalone executable
+## Building from source
 
-Produces a single self-contained `dist/Quack.exe` (no Python install needed) with
-the duck icon and no console window. Pick whichever is easiest:
+Building the `.exe` **requires Python**, because [PyInstaller](https://pyinstaller.org/)
+(the packager) is a Python tool. Pick whichever fits:
 
-**1. Double-click `build.bat`** (Windows) — installs the build deps and produces
-`dist\Quack.exe`.
+**1. Let GitHub build it — no Python on your machine.** The
+[build workflow](.github/workflows/build.yml) builds the exe in the cloud on every
+push (downloadable from the run's *Artifacts*). Push a version tag and it publishes
+a Release with `Quack.exe` attached:
 
-**2. Run the command manually:**
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+**2. Double-click `build.bat`** (Windows, Python installed) — installs the build
+deps and produces `dist\Quack.exe`. If Python is missing it tells you where to get
+the prebuilt exe instead.
+
+**3. Run the command manually:**
 
 ```sh
 pip install pillow pyinstaller
 python -m PyInstaller --onefile --windowed --name Quack ^
     --icon icon.ico --collect-submodules quack run.py
-```
-
-**3. Let GitHub build it** — the [build workflow](.github/workflows/build.yml) runs
-on every push and uploads `Quack.exe` as a downloadable artifact. Push a version
-tag to publish a release with the exe attached:
-
-```sh
-git tag v1.0.0
-git push origin v1.0.0
 ```
 
 ## Project layout
