@@ -34,12 +34,26 @@ python -m quack
 ## Build a standalone executable
 
 Produces a single self-contained `dist/Quack.exe` (no Python install needed) with
-the duck icon and no console window:
+the duck icon and no console window. Pick whichever is easiest:
+
+**1. Double-click `build.bat`** (Windows) — installs the build deps and produces
+`dist\Quack.exe`.
+
+**2. Run the command manually:**
 
 ```sh
-pip install pyinstaller
+pip install pillow pyinstaller
 python -m PyInstaller --onefile --windowed --name Quack ^
     --icon icon.ico --collect-submodules quack run.py
+```
+
+**3. Let GitHub build it** — the [build workflow](.github/workflows/build.yml) runs
+on every push and uploads `Quack.exe` as a downloadable artifact. Push a version
+tag to publish a release with the exe attached:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 ## Project layout

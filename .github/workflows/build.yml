@@ -1,0 +1,43 @@
+name: Build Quack.exe
+
+# Builds the Windows executable.
+#   - On every push/PR: builds and uploads Quack.exe as a workflow artifact
+#     (download it from the run's "Artifacts" section).
+#   - On a pushed tag like v1.0.0: also attaches Quack.exe to a GitHub Release.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pillow pyinstaller
+
+      - name: Build executable
+        run: >
+          python -m PyInstaller --onefile --windowed --name Quack
+          --icon icon.ico --collect-submodules quack run.py
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quack
+          path: dist/Quack.exe
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Quack.exe
