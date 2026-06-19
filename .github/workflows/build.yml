@@ -12,6 +12,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write  # needed to create/attach the Release
+
 jobs:
   build:
     runs-on: windows-latest
