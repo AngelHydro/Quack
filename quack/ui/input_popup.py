@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import tkinter as tk
-from tkinter import ttk
 from typing import Callable
+
+from quack.ui.screen import clamp_to_screens
 
 TRANSPARENT_KEY = "#010101"
 BG_POPUP = "#FFFDE7"
@@ -94,10 +95,7 @@ class TextInputPopup:
             self._on_submit(text)
 
     def _position(self, duck_cx: int, duck_cy: int) -> None:
-        sw = self._root.winfo_screenwidth()
-        sh = self._root.winfo_screenheight()
         x = duck_cx + 20
         y = duck_cy - self.H // 2
-        x = max(4, min(x, sw - self.W - 4))
-        y = max(4, min(y, sh - self.H - 4))
+        x, y = clamp_to_screens(x, y, self.W, self.H)
         self._win.geometry(f"{self.W}x{self.H}+{x}+{y}")

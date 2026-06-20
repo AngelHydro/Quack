@@ -5,6 +5,8 @@ from __future__ import annotations
 import tkinter as tk
 from typing import Callable
 
+from quack.ui.screen import clamp_to_screens
+
 BG       = "#2B2B2B"
 FG       = "#EEEEEE"
 HOVER_BG = "#F5C518"
@@ -24,10 +26,7 @@ class QuitMenu:
     def show(self, x: int, y: int) -> None:
         if self._win is None:
             self._build()
-        sw = self._root.winfo_screenwidth()
-        sh = self._root.winfo_screenheight()
-        px = max(4, min(x, sw - self.W - 4))
-        py = max(4, min(y, sh - self.H - 4))
+        px, py = clamp_to_screens(x, y, self.W, self.H)
         self._win.geometry(f"{self.W}x{self.H}+{px}+{py}")
         self._win.deiconify()
         self._win.lift()

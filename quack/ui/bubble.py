@@ -4,10 +4,16 @@ from __future__ import annotations
 
 import tkinter as tk
 
+from quack.ui.screen import clamp_to_screens
+
 TRANSPARENT_KEY = "#010101"
 BG   = "#FFFDE7"
 BORDER = "#F5C518"
 TEXT_COLOR = "#333333"
+
+# Half the rendered duck height (96 px tall sprite) — used to lift the bubble
+# clear of the duck's head instead of overlapping the face.
+DUCK_HALF_H = 48
 
 
 class SpeechBubble:
@@ -97,11 +103,10 @@ class SpeechBubble:
             self._canvas.itemconfig(self._text_id, text=text)
 
     def _position(self, duck_cx: int, duck_cy: int) -> None:
-        sw = self._root.winfo_screenwidth()
-        sh = self._root.winfo_screenheight()
         total_h = self.H + self.TAIL_H
         x = duck_cx - self.W // 3       # tail roughly over duck head
-        y = duck_cy - total_h - 10
-        x = max(4, min(x, sw - self.W - 4))
-        y = max(4, min(y, sh - total_h - 4))
+        # Lift the whole bubble above the head: the tail tip lands just at the
+        # top of the duck instead of over its face.
+        y = duck_cy - DUCK_HALF_H - total_h + 6
+        x, y = clamp_to_screens(x, y, self.W, total_h)
         self._win.geometry(f"{self.W}x{total_h}+{x}+{y}")
