@@ -31,7 +31,7 @@ class TextInputPopup:
         self._entry.delete(0, tk.END)
         self._win.deiconify()
         self._win.lift()
-        self._entry.focus_set()
+        self._entry.focus_force()  # overrideredirect windows on macOS need force
         self._visible = True
 
     def hide(self) -> None:

@@ -9,6 +9,11 @@ duck has been dragged onto a second monitor. These helpers query the Windows
 from __future__ import annotations
 
 import ctypes
+import sys
+import tkinter as tk
+
+IS_WIN = sys.platform == "win32"
+IS_MAC = sys.platform == "darwin"
 
 # GetSystemMetrics indices for the virtual screen (all monitors combined).
 _SM_XVIRTUALSCREEN = 76
@@ -17,11 +22,29 @@ _SM_CXVIRTUALSCREEN = 78
 _SM_CYVIRTUALSCREEN = 79
 
 
+def make_transparent(win: tk.Misc, key: str) -> str:
+    """Make *win* see-through and return the background colour to paint with.
+
+    Windows uses a colour key; macOS has real per-pixel alpha instead.
+    """
+    if IS_MAC:
+        win.wm_attributes("-transparent", True)
+        return "systemTransparent"
+    win.wm_attributes("-transparentcolor", key)
+    return key
+
+
 def virtual_screen_rect() -> tuple[int, int, int, int]:
     """Return (left, top, width, height) spanning every monitor.
 
-    Falls back to a single 1920x1080 screen if the Win32 call is unavailable.
+    Off Windows, falls back to Tk's primary-screen size.
     """
+    if not IS_WIN:
+        # ponytail: primary monitor only on macOS/Linux; use NSScreen via pyobjc if multi-monitor matters
+        root = tk._default_root
+        if root is not None:
+            return 0, 0, root.winfo_screenwidth(), root.winfo_screenheight()
+        return 0, 0, 1920, 1080
     try:
         gsm = ctypes.windll.user32.GetSystemMetrics
         left = gsm(_SM_XVIRTUALSCREEN)

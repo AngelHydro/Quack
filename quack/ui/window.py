@@ -8,6 +8,8 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from typing import TYPE_CHECKING
 
+from quack.ui.screen import IS_MAC, IS_WIN, make_transparent
+
 if TYPE_CHECKING:
     from quack.animator import Animator, AnimFrame
     from quack.assets import DuckSprite
@@ -28,7 +30,9 @@ TOPMOST_REASSERT_MS = 5_000
 
 
 def _pil_to_photoimage(img: Image.Image) -> ImageTk.PhotoImage:
-    """Composite RGBA image onto TRANSPARENT_KEY background."""
+    """Composite RGBA image onto TRANSPARENT_KEY background (macOS keeps alpha)."""
+    if IS_MAC:
+        return ImageTk.PhotoImage(img)
     bg = Image.new("RGB", img.size, TRANSPARENT_KEY)
     bg.paste(img, mask=img.split()[3])
     return ImageTk.PhotoImage(bg)
@@ -76,8 +80,8 @@ class DuckWindow:
         root = self._root
         root.overrideredirect(True)
         root.wm_attributes("-topmost", True)
-        root.wm_attributes("-transparentcolor", TRANSPARENT_KEY)
-        root.config(bg=TRANSPARENT_KEY)
+        self._bg = make_transparent(root, TRANSPARENT_KEY)
+        root.config(bg=self._bg)
 
         sw = root.winfo_screenwidth()
         sh = root.winfo_screenheight()
@@ -89,7 +93,7 @@ class DuckWindow:
         canvas = tk.Canvas(
             self._root,
             width=CANVAS_SIZE, height=CANVAS_SIZE,
-            bg=TRANSPARENT_KEY, highlightthickness=0,
+            bg=self._bg, highlightthickness=0,
         )
         canvas.pack()
         self._canvas = canvas
@@ -112,8 +116,15 @@ class DuckWindow:
         canvas.bind("<B1-Motion>",   self._on_drag)
         canvas.bind("<ButtonRelease-1>", self._on_left_release)
         canvas.bind("<Button-3>",    self._on_right_click)
+        if IS_MAC:
+            # Aqua Tk 8.6 reports right click as Button-2; Ctrl+click too
+            canvas.bind("<Button-2>",         self._on_right_click)
+            canvas.bind("<Control-Button-1>", self._on_right_click)
 
     def _apply_win32_flags(self) -> None:
+        self._hwnd = None
+        if not IS_WIN:
+            return
         self._root.update_idletasks()
         try:
             hwnd = ctypes.windll.user32.GetParent(self._root.winfo_id())
