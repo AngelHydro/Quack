@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import tkinter as tk
 
-from quack.ui.screen import clamp_to_screens
+from quack.ui.screen import clamp_to_screens, make_transparent
 
 TRANSPARENT_KEY = "#010101"
 BG   = "#FFFDE7"
@@ -54,14 +54,14 @@ class SpeechBubble:
         win = tk.Toplevel(self._root)
         win.overrideredirect(True)
         win.wm_attributes("-topmost", True)
-        win.wm_attributes("-transparentcolor", TRANSPARENT_KEY)
+        bg = make_transparent(win, TRANSPARENT_KEY)
         total_h = self.H + self.TAIL_H
         win.geometry(f"{self.W}x{total_h}")
-        win.config(bg=TRANSPARENT_KEY)
+        win.config(bg=bg)
 
         canvas = tk.Canvas(
             win, width=self.W, height=total_h,
-            bg=TRANSPARENT_KEY, highlightthickness=0,
+            bg=bg, highlightthickness=0,
         )
         canvas.pack()
         self._canvas = canvas

@@ -33,6 +33,15 @@ move it to your Desktop or pin a shortcut anywhere.
 > binary). It is published on the Releases page instead, built automatically by
 > GitHub. See [Building](#building-from-source) below if you want to make it yourself.
 
+### macOS
+
+Download **`Quack-macOS.zip`** from the
+[Releases page](https://github.com/AngelHydro/Quack/releases), unzip it and move
+`Quack.app` to Applications. The app is not signed, so the first time
+**right-click → Open** (or *System Settings → Privacy & Security → Open Anyway*).
+
+On a Mac the right click is a two-finger click or **Ctrl + click**.
+
 ## Run from source
 
 For developers who have Python 3.10+ installed:
@@ -41,6 +50,9 @@ For developers who have Python 3.10+ installed:
 pip install pillow
 python -m quack
 ```
+
+On macOS use the Python from [python.org](https://www.python.org/downloads/)
+(it ships a recent Tk). With Homebrew Python, also run `brew install python-tk`.
 
 ## Building from source
 
@@ -68,6 +80,17 @@ pip install pillow pyinstaller
 python -m PyInstaller --onefile --windowed --name Quack ^
     --icon icon.ico --collect-submodules quack run.py
 ```
+
+**macOS:**
+
+```sh
+pip install pillow pyinstaller
+python -c "from PIL import Image; Image.open('icon.ico').save('icon.icns')"
+python -m PyInstaller --windowed --name Quack \
+    --icon icon.icns --collect-submodules quack run.py
+```
+
+This produces `dist/Quack.app`.
 
 ## Project layout
 

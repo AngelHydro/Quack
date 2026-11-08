@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+import tempfile
 import threading
-import winsound
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -78,7 +81,30 @@ class AppController:
     def _play_quack(self) -> None:
         wav = self._quack_wav
 
-        def _play() -> None:
-            winsound.PlaySound(wav, winsound.SND_MEMORY)
+        if sys.platform == "win32":
+            import winsound
+
+            def _play() -> None:
+                winsound.PlaySound(wav, winsound.SND_MEMORY)
+        else:
+            path = self._wav_file()
+
+            def _play() -> None:
+                # afplay ships with macOS; aplay is the usual Linux fallback
+                cmd = "afplay" if sys.platform == "darwin" else "aplay"
+                try:
+                    subprocess.run([cmd, path], stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL, check=False)
+                except OSError:
+                    pass
 
         threading.Thread(target=_play, daemon=True).start()
+
+    def _wav_file(self) -> str:
+        """Write the quack once to a temp file (afplay can't read from memory)."""
+        if getattr(self, "_wav_path", None) is None:
+            fd, path = tempfile.mkstemp(prefix="quack-", suffix=".wav")
+            with os.fdopen(fd, "wb") as f:
+                f.write(self._quack_wav)
+            self._wav_path = path
+        return self._wav_path
